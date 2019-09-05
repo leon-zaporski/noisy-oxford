@@ -108,6 +108,6 @@ var white_n = [];
 
 TESTER = document.getElementById('tester');
 	Plotly.plot( TESTER, [{
-	x: indices,
-	y: white_n }], {
+	x: [0,1,2,3],
+	y: [3,2,1,0] }], {
 	margin: { t: 0 } } );
