@@ -26,7 +26,7 @@ function randn_bm() {
 function spectrum(array1) {
     var imag = Array.apply(null, Array(array1.length)).map(Number.prototype.valueOf,0);
     transform(array1,imag);
-    return math.square(array1) + math.square(imag)
+    return Math.pow(array1,2) + Math.pow(imag,2)
 }
 
 	
