@@ -7,7 +7,9 @@
   
 <body>
   
-<div id="tester" style="width:80%;height:80%;"></div>  
+<div id="tester" style="width:45%;height:45%;"></div>  
+<div id="tester2" style="width:45%;height:45%;"></div>  
+	
 <input type="range" id="myRange" value="0" step="0.001" min="-2" max="2" oninput="myFunction()">
 
 <p id="demo"></p>
@@ -51,9 +53,10 @@ function myFunction() {
   		 type: 'scatter'
 		};
   TESTER = document.getElementById('tester');
-  var data = [trace1, trace2];
-  var layout = { grid: {rows: 1, columns: 2, pattern: 'independent'}, };
-  Plotly.newPlot(TESTER, data, layout, {margin: { t: 0 }} );
+  TESTER2 = document.getElementById('tester2');
+
+  Plotly.newPlot(TESTER, trace1, {margin: { t: 0 }} );
+  Plotly.newPlot(TESTER2, trace2, {margin: { t: 0 }} );
 }
 
 </script>
