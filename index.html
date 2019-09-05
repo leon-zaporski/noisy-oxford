@@ -7,16 +7,23 @@
   
 <body>
   
-<div id="tester" style="width:90%;height:10%;"></div>  
-<div id="tester2" style="width:90%;height:10%;"></div>  
+<div id="tester" style="width:90%;height:100;"></div>  
+<div id="tester2" style="width:90%;height:100;"></div>  
 	
-<input type="range" id="myRange" value="0" step="0.001" min="-2" max="2" oninput="myFunction()">
+<input type="range" id="myRange" value="0" step="0.001" min="-2" max="2" >
 
 <p id="demo"></p>
 
 <script type="text/javascript" src="fft.js"></script>
-	
+
 <script>
+
+function addvector(a,b){
+    return a.map((e,i) => e + b[i]);
+}
+
+const arrSum = arr => arr.reduce((a,b) => a + b, 0)
+
 //box muller transform
 function randn_bm() {
     var u = 0, v = 0;
@@ -24,39 +31,121 @@ function randn_bm() {
     while(v === 0) v = Math.random();
     return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
 }
+	
 
 function spectrum(array1) {
     var imag = Array.apply(null, Array(array1.length)).map(Number.prototype.valueOf,0);
     transform(array1,imag);
-    return Math.pow(array1,2) + Math.pow(imag,2)
+    return addvector(array1.map(function (a){return a*a;}),imag.map(function (a){return a*a;}));
 }
 
-	
-function myFunction() {
-  var x = document.getElementById("myRange").value;
-  document.getElementById("demo").innerHTML = x;
-  
-  var lenarr = 44100
-  var indices = Array.from(Array(lenarr).keys())
-  var white_n = [];
-	
-  for (var i = 0; i < indices.length; i++) {
-   	   white_n.push(randn_bm());
-  }	
-	
-  var trace1 = { x: indices,
- 		 y: white_n,
-  		 type: 'scatter'
-		};
-  var trace2 = { x: indices,
- 		 y: spectrum(white_n),
-		 type: 'scatter'
- 		};
-  TESTER = document.getElementById('tester');
-  TESTER2 = document.getElementById('tester2');
 
-  Plotly.newPlot(TESTER, [trace1], {margin: { t: 0 }} );
-  Plotly.newPlot(TESTER2, [trace2], {margin: { t: 0 }} );
+function colourise(axp, array1){
+     var no_fre = array1.length;
+     var indicess = Array.from(Array(no_fre).keys());
+     var freqs = addvector(indicess.map(function (a){return (no_fre/2 - Math.abs(a - no_fre/2));} ),Array.apply(null, Array(no_fre)).map(Number.prototype.valueOf,1));
+     return array1.map((e,i) => e /Math.pow(freqs[i],axp/2));
+ }
+
+
+var slider = document.getElementById("myRange")
+
+/////TESTTTT
+
+// var context;    // Audio context
+// var buf;  
+
+// function playByteArray(byteArray) {
+
+// var arrayBuffer = new ArrayBuffer(byteArray.length);
+// var bufferView = new Uint8Array(arrayBuffer);
+// for (i = 0; i < byteArray.length; i++) {
+//   bufferView[i] = byteArray[i];
+// }
+
+// context.decodeAudioData(arrayBuffer, function(buffer) {
+//     buf = buffer;
+//     play();
+// });
+// }
+
+
+////////
+
+// Oninput:
+slider.onclick= function myFunction() {
+    //get value from slider
+    sliderr = Number(this.value);
+    //whitenoise generation
+    var lenarr = 44100
+    var indices = Array.from(Array(lenarr).keys())
+    
+    var white_n = [];
+    var imag = Array.apply(null, Array(indices.length)).map(Number.prototype.valueOf,0);
+   
+    for (var i = 0; i < indices.length; i++) {
+            white_n.push(randn_bm());}
+    //Colouring       
+    transform(white_n,imag)
+    var power_constant= arrSum(addvector(white_n.map(function (a){return a*a;}),imag.map(function (a){return a*a;})))
+    
+    white_n=colourise(sliderr, white_n)
+    imag=colourise(sliderr, imag)
+    
+    //Normalising
+    var normalising_constant=power_constant/(arrSum(addvector(white_n.map(function (a){return a*a;}),imag.map(function (a){return a*a;}))))
+   
+    white_n=white_n.map(function(x) { return x * normalising_constant; })
+    imag=imag.map(function(x) { return x * Math.sqrt(normalising_constant); })
+
+    //spectrum
+    var spectre = addvector(white_n.map(function (a){return a*a;}),imag.map(function (a){return a*a;}));
+    //coloured noise:
+    inverseTransform(white_n,imag)
+    white_n=white_n.map(function(x) { return x / white_n.length; })
+
+    //plotting
+    var trace1 = { x: indices,
+        y: white_n,
+    };
+    var trace2 = { x: indices.slice(1,Math.floor(indices.length/2)),
+        y: spectre.slice(1,Math.floor(indices.length/2)),
+    };
+
+TESTER = document.getElementById('tester');
+TESTER2 = document.getElementById('tester2'); 
+
+var layout2 = {
+  xaxis: {
+    type: 'log',
+    autorange: true
+  },
+  yaxis: {
+    type: 'log',
+    autorange: true
+  },
+  height: 300,margin: { t: 0 }
+};
+
+
+Plotly.newPlot(TESTER, [trace1], {height: 300, margin: { t: 0 }} );
+Plotly.newPlot(TESTER2, [trace2], layout2);
+
+////Testtt
+// if (!window.AudioContext) {
+//     if (!window.webkitAudioContext) {
+//         alert("Your browser does not support any AudioContext and cannot play back this audio.");
+//         return;
+//     }
+//         window.AudioContext = window.webkitAudioContext;
+//     }
+
+//     context = new AudioContext();
+
+
+// playByteArray(white_n)
+//////
+
 }
 
 </script>
