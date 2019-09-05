@@ -1,4 +1,8 @@
-function Ziggurat(){
+function Ziggurat(seed) {
+  seed = arguments.length
+	  ? seed
+	  : new Date().getTime();
+  
   var jsr = 123456789;
 
   var wn = Array(128);
@@ -13,7 +17,7 @@ function Ziggurat(){
 
   this.nextGaussian = function(){
     return RNOR();
-  }
+  };
 
   function nfix(hz, iz){
     var r = 3.442619855899;
@@ -33,11 +37,11 @@ function Ziggurat(){
       }
 
       if( fn[iz] + UNI() * (fn[iz-1] - fn[iz]) < Math.exp(-0.5 * x * x) ){
-          return x;
+         return x;
       }
       hz = SHR3();
       iz = hz & 127;
-
+ 
       if( Math.abs(hz) < kn[iz]){
         return (hz * wn[iz]);
       }
@@ -58,9 +62,9 @@ function Ziggurat(){
     return 0.5 * (1 + SHR3() / -Math.pow(2,31));
   }
 
-  function zigset(){
+  function zigset(seed) {
     // seed generator based on current time
-    jsr ^= new Date().getTime();
+    jsr ^= seed;
 
     var m1 = 2147483648.0;
     var dn = 3.442619855899;
@@ -85,9 +89,11 @@ function Ziggurat(){
       wn[i] = dn / m1;
     }
   }
-  zigset();
+
+  zigset(seed);
 }
 
+module.exports = Ziggurat;
 //ZIGGURAT Gaussian Number generator mean=0, var = 1
 //Code from https://filosophy.org/code/normal-distributed-random-values-in-javascript-using-the-ziggurat-algorithm/
 
