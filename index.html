@@ -8,8 +8,12 @@
 <body>
   
 <div id="tester" style="width:80%;height:80%;"></div>  
+<input type="range" id="myRange" value="0" step="0.001" min="-2" max="2" onclick="myFunction()">
+
+<p id="demo"></p>
 
 <script>
+//box muller transform
 function randn_bm() {
     var u = 0, v = 0;
     while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
@@ -17,18 +21,27 @@ function randn_bm() {
     return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
 }
 
-var lenarr = 100000
-var indices = Array.from(Array(lenarr).keys())
-var white_n = [];
-for (var i = 0; i < indices.length; i++) {
-     white_n.push(randn_bm());
+function myFunction() {
+  var x = document.getElementById("myRange").value;
+  document.getElementById("demo").innerHTML = x;
+  
+  var lenarr = 44100
+  var indices = Array.from(Array(lenarr).keys())
+  var white_n = [];
+  for (var i = 0; i < indices.length; i++) {
+   	   white_n.push(randn_bm());
+  }
+
+  TESTER = document.getElementById('tester');
+  Plotly.newPlot( TESTER, [{
+		    	x: indices,
+		    	y: white_n }],
+              {margin: { t: 0 }}
+            );
 }
 
-TESTER = document.getElementById('tester');
-	Plotly.plot( TESTER, [{
-	x: indices,
-	y: white_n }], {
-	margin: { t: 0 } } );
+
+    
 
 </script>
 
