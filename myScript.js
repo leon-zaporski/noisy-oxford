@@ -7,7 +7,6 @@ var white_n = [];
 for (var i = 0; i < indices.length; i++) {
      white_n.push(Math.random());
 }
-document.write(white_n);
 
 TESTER = document.getElementById('tester');
 	Plotly.plot( TESTER, [{
