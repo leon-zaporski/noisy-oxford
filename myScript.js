@@ -91,19 +91,18 @@ function Ziggurat(){
 //ZIGGURAT Gaussian Number generator mean=0, var = 1
 //Code from https://filosophy.org/code/normal-distributed-random-values-in-javascript-using-the-ziggurat-algorithm/
 
-var z = new Ziggurat();
 
-function randomArray(length) {
-    return Array.apply(null, Array(length)).map(function() {
-        return z.nextGaussian();
-    });
-}
-
-// Generate array of gaussian numbers with given length
 
 var lenarr = 100
-var white_n = randomArray(lenarr)
 var indices = Array.from(Array(lenarr).keys())
+var z = new Ziggurat();
+
+var white_n = [];
+    for (var i = 0; i < indices.length; i++) {
+        white_n.push(z.nextGaussian());
+    }
+
+
 
 
 
