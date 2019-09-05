@@ -23,6 +23,13 @@ function randn_bm() {
     return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
 }
 
+function spectrum(array1) {
+    var imag = Array.apply(null, Array(array1.length)).map(Number.prototype.valueOf,0);
+    transform(array1,imag);
+    return Math.square(array1) + Math.square(imag)
+}
+
+	
 function myFunction() {
   var x = document.getElementById("myRange").value;
   document.getElementById("demo").innerHTML = x;
@@ -30,16 +37,24 @@ function myFunction() {
   var lenarr = 44100
   var indices = Array.from(Array(lenarr).keys())
   var white_n = [];
+	
   for (var i = 0; i < indices.length; i++) {
    	   white_n.push(randn_bm());
-  }
-
+  }	
+	
+  var trace1 = { x: indices,
+ 		 y: white_n,
+  		 type: 'scatter'
+		};
+  var trace2 = { x: indices,
+ 		 y: spectrum(white_n),
+  		 type: 'scatter'
+		};
   TESTER = document.getElementById('tester');
-  Plotly.newPlot( TESTER, [{
-		    	x: indices,
-		    	y: white_n }],
-              {margin: { t: 0 }}
-            );
+  var data = [trace1, trace2];
+  var layout = { grid: {rows: 1, columns: 2, pattern: 'independent'}, };
+  Plotly.newPlot(TESTER, data, layout); 
+ //, {margin: { t: 0 }} );
 }
 
 </script>
