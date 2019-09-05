@@ -26,7 +26,7 @@ function randn_bm() {
 function spectrum(array1) {
     var imag = Array.apply(null, Array(array1.length)).map(Number.prototype.valueOf,0);
     transform(array1,imag);
-    return Math.square(array1) + Math.square(imag)
+    return math.square(array1) + math.square(imag)
 }
 
 	
@@ -53,8 +53,7 @@ function myFunction() {
   TESTER = document.getElementById('tester');
   var data = [trace1, trace2];
   var layout = { grid: {rows: 1, columns: 2, pattern: 'independent'}, };
-  Plotly.newPlot(TESTER, data, layout); 
- //, {margin: { t: 0 }} );
+  Plotly.newPlot(TESTER, data, layout, {margin: { t: 0 }} );
 }
 
 </script>
