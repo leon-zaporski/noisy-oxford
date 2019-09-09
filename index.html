@@ -2,19 +2,37 @@
 <html>
   
 <head>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.4/Pizzicato.js></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.6/chroma.min.js"></script>
+
+
 </head>
   
-<body>
-  
-<div id="tester" style="width:90%;height:100;"></div>  
-<div id="tester2" style="width:90%;height:100;"></div>  
+
+<style>
+  p {
+	color: rgb(255,255,255)
+}
+</style>
+
+
+<body bgcolor="#191A1A">
+    <center><p style = "font-family:'Courier New', Courier, monospace;font-size:16px;">
+        1 Second of Coloured Noise
+     </p></center>
+<center><div id="tester" style="width:95%;height:45%;"></div></center> 
+<center><p style = "font-family:'Courier New', Courier, monospace;font-size:16px;">
+    Power Spectrum
+ </p></center>
+<center><div id="tester2" style="width:95%;height:45%;"></div> </center> 
 	
-<input type="range" id="myRange" value="0" step="0.001" min="-2" max="2" >
 
 <p id="demo"></p>
 
 <script type="text/javascript" src="fft.js"></script>
+<script type="text/javascript" src="web-audio.js"></script>
 
 <script>
 
@@ -48,68 +66,64 @@ function colourise(axp, array1){
  }
 
 
-var slider = document.getElementById("myRange")
 
-/////TESTTTT
-
-// var context;    // Audio context
-// var buf;  
-
-// function playByteArray(byteArray) {
-
-// var arrayBuffer = new ArrayBuffer(byteArray.length);
-// var bufferView = new Uint8Array(arrayBuffer);
-// for (i = 0; i < byteArray.length; i++) {
-//   bufferView[i] = byteArray[i];
-// }
-
-// context.decodeAudioData(arrayBuffer, function(buffer) {
-//     buf = buffer;
-//     play();
-// });
-// }
+ function centralise(array1){
+     var mea = arrSum(array1)/array1.length;
+     return array1.map(function(x) { return x - mea; });
+ }
 
 
-////////
+ function intoByteArr(array1){
+    for (i = 0; i < array1.length; i++) {
+        if (Math.abs(array1[i])>24){
+            array1[i]=24*(array1[i]/Math.abs(array1[i]))
+        }
+    }
+    return array1.map(function(x) { return x/24; });
+ }
 
-// Oninput:
-slider.onclick= function myFunction() {
-    //get value from slider
-    sliderr = Number(this.value);
-    //whitenoise generation
-    var lenarr = 44100
-    var indices = Array.from(Array(lenarr).keys())
+
+
+//////colormap//////
+
+colormap_1=chroma.scale(['blue', 'white', 'red']).domain([-2,2]);
+
+/////////////////
+
+
+var soundNo= [];
+var lenarr = 44100;
+///// initialize window //////////////////////////////////////////////
+
+
+var indices = Array.from(Array(lenarr).keys())
     
-    var white_n = [];
-    var imag = Array.apply(null, Array(indices.length)).map(Number.prototype.valueOf,0);
+var imag = Array.apply(null, Array(indices.length)).map(Number.prototype.valueOf,0);
    
-    for (var i = 0; i < indices.length; i++) {
-            white_n.push(randn_bm());}
-    //Colouring       
-    transform(white_n,imag)
-    var power_constant= arrSum(addvector(white_n.map(function (a){return a*a;}),imag.map(function (a){return a*a;})))
-    
-    white_n=colourise(sliderr, white_n)
-    imag=colourise(sliderr, imag)
-    
-    //Normalising
-    var normalising_constant=power_constant/(arrSum(addvector(white_n.map(function (a){return a*a;}),imag.map(function (a){return a*a;}))))
+var white_n = [];
+for (var i = 0; i < indices.length; i++) {
+        white_n.push(randn_bm());}
+          
+transform(white_n,imag);
+var spectre = addvector(white_n.map(function (a){return a*a;}),imag.map(function (a){return a*a;}));
    
-    white_n=white_n.map(function(x) { return x * normalising_constant; })
-    imag=imag.map(function(x) { return x * Math.sqrt(normalising_constant); })
+transform(imag,white_n)
+white_n=white_n.map(function(x) { return x / white_n.length; })
 
-    //spectrum
-    var spectre = addvector(white_n.map(function (a){return a*a;}),imag.map(function (a){return a*a;}));
-    //coloured noise:
-    inverseTransform(white_n,imag)
-    white_n=white_n.map(function(x) { return x / white_n.length; })
 
-    //plotting
-    var trace1 = { x: indices,
-        y: white_n,
+var trace1 = { x: indices,
+    y: white_n,
+    line: {
+    color: colormap_1(0).css(),
+    width: 0.9}
     };
-    var trace2 = { x: indices.slice(1,Math.floor(indices.length/2)),
-        y: spectre.slice(1,Math.floor(indices.length/2)),
+
+var trace2 = { x: indices.slice(1,Math.floor(indices.length/2)),
+    y: spectre.slice(1,Math.floor(indices.length/2)),
+    line: {
+    color: colormap_1(0).css(),
+    width: 0.9},
+    
     };
 
 TESTER = document.getElementById('tester');
@@ -124,29 +138,227 @@ var layout2 = {
     type: 'log',
     autorange: true
   },
-  height: 300,margin: { t: 0 }
+  height: 300,
+  margin: { t: 0 },
+  paper_bgcolor: '#191A1A',
+  plot_bgcolor: '#191A1A',
+  };
+
+
+Plotly.newPlot(TESTER, [trace1], {height: 300, margin: { t: 0 }, paper_bgcolor: '#191A1A', plot_bgcolor: '#191A1A'},
+  {displayModeBar: false});
+Plotly.newPlot(TESTER2, [trace2], layout2,{displayModeBar: false});
+
+////GUI
+var gui = new dat.GUI();
+
+var obj = {
+	alpha: 0,
+  PlayNoise: function(){functionButton()}
 };
 
+gui.add(obj, "alpha").min(-2).max(2).step(0.001).onFinishChange(function(newValue) { //onChange
+	myFunction(newValue);
+}); //.listen();
 
-Plotly.newPlot(TESTER, [trace1], {height: 300, margin: { t: 0 }} );
+gui.add(obj,"PlayNoise");
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var slider = document.getElementById("myRange")
+// Oninput:
+//slider.onclick= function myFunction() {
+function myFunction(newValue1) {
+   // sliderr = Number(this.value);
+    //whitenoise generation
+    sliderr=Number(newValue1);
+    var indices = Array.from(Array(lenarr).keys());
+    
+    var imag = Array.apply(null, Array(indices.length)).map(Number.prototype.valueOf,0);
+   
+    var white_n = [];
+    for (var i = 0; i < indices.length; i++) {
+            white_n.push(randn_bm());}
+    //Colouring       
+    transform(white_n,imag);
+    var power_constant= arrSum(addvector(white_n.slice(80,15000).map(function (a){return a*a;}),imag.slice(80,15000).map(function (a){return a*a;})));
+    
+    white_n=colourise(sliderr, white_n);
+    imag=colourise(sliderr, imag);
+    
+    //Normalising
+    var normalising_constant=power_constant/(arrSum(addvector(white_n.slice(80,15000).map(function (a){return a*a;}),imag.slice(80,15000).map(function (a){return a*a;}))));
+   
+    white_n=white_n.map(function(x) { return x * Math.sqrt(normalising_constant); })
+    imag=imag.map(function(x) { return x * Math.sqrt(normalising_constant); })
+
+    //spectrum
+    var spectre = addvector(white_n.map(function (a){return a*a;}),imag.map(function (a){return a*a;}));
+    //coloured noise:
+    transform(imag,white_n)
+    white_n=white_n.map(function(x) { return x / white_n.length; })
+
+    //centralise
+    white_n=centralise(white_n)
+
+    //plotting
+    var trace1 = { x: indices,
+        y: white_n,
+        line: {
+    width: 0.9,
+    color: colormap_1(sliderr).css()}
+    };
+
+    var trace2 = { x: indices.slice(1,Math.floor(indices.length/2)),
+        y: spectre.slice(1,Math.floor(indices.length/2)),
+        line: {
+    width: 0.9,
+    color: colormap_1(sliderr).css()}
+    };
+
+TESTER = document.getElementById('tester');
+TESTER2 = document.getElementById('tester2'); 
+
+var layout2 = {
+  xaxis: {
+    type: 'log',
+    autorange: true
+  },
+  yaxis: {
+    type: 'log',
+    autorange: true
+  },
+  paper_bgcolor: '#191A1A',
+  plot_bgcolor: '#191A1A',
+  height: 300,margin: { t: 0 },
+  };
+
+//height: 300,
+
+Plotly.newPlot(TESTER, [trace1], { height: 300, margin: { t: 0 }, paper_bgcolor: '#191A1A', plot_bgcolor: '#191A1A'} );
 Plotly.newPlot(TESTER2, [trace2], layout2);
 
-////Testtt
-// if (!window.AudioContext) {
-//     if (!window.webkitAudioContext) {
-//         alert("Your browser does not support any AudioContext and cannot play back this audio.");
-//         return;
+
+///ANIMATED - no color change possible atm
+// Plotly.animate(TESTER, {
+//     layout: {
+//       yaxis: {range: [Math.min.apply(null, white_n), Math.max.apply(null, white_n)]},
+//       color: colormap_1(sliderr).css()
 //     }
-//         window.AudioContext = window.webkitAudioContext;
+//   }, {
+//     transition: {
+//       duration: 300,
+//       easing: 'cubic-in-out'
 //     }
+//   })
 
-//     context = new AudioContext();
+// Plotly.animate(TESTER,{
+//     data: [{y: white_n}],
+//     traces: [0],
+//     layout: {}}, {
+//     transition: {
+//       duration: 300,
+//       easing: 'cubic-in-out'
+//     },
+//     frame: {
+//       duration: 300
+//     }
+//   });
 
 
-// playByteArray(white_n)
-//////
+
+//   Plotly.animate(TESTER2,{
+//     data: [{y: spectre.slice(1,Math.floor(indices.length/2))}],
+//     traces: [0],
+//     layout: {}}, {
+//     transition: {
+//       duration: 300,
+//       easing: 'cubic-in-out'
+//     },
+//     frame: {
+//       duration: 300
+//     }
+//   });
+
+//   Plotly.animate(TESTER2, {
+//     layout: {
+//        xaxis: {
+//     type: 'log',
+//     autorange: true
+//   },
+//   yaxis: {
+//     type: 'log',
+//     autorange: true
+//   },
+//   height: 300,margin: { t: 0 },
+//   color: colormap_1(sliderr).css()
+//     }
+//   }, {
+//     transition: {
+//       duration: 300,
+//       easing: 'cubic-in-out'
+//     }
+//   })
+  
+soundNo=intoByteArr(white_n);
+
+/// THIS IS TO INITIALIZE AUDIO
+var context = new AudioContext();
+    context.resume().then(() => {
+    var sineWave = new Pizzicato.Sound({ 
+    source: 'wave', 
+    options: {
+        frequency: 440
+    }
+});
+
+sineWave.play();
+sineWave.pause();
+
+///////
+  });
+}
+
+
+
+var global_ind =-1;
+function passsound(){
+    global_ind=(global_ind+1)%lenarr;
+    return soundNo[global_ind];
+}
+
+function functionButton(){
+    //console.log(soundNo)
+    //16384
+    var context = new AudioContext();
+    context.resume().then(() => {
+    
+    
+    
+    var lll = new Pizzicato.Sound({
+    source: 'script',
+    options: {
+        attack: 0,
+        bufferSize: 8192,
+        audioFunction: function(e) {
+            var output = e.outputBuffer.getChannelData(0);
+            for (var i = 0; i < e.outputBuffer.length; i++){
+                output[i] = passsound();
+                } 
+                
+         }
+      
+    }
+    });
+    lll.volume = 1;
+    lll.play();
+    setTimeout(function(){lll.pause()},1000);
+  });
+
 
 }
+
 
 </script>
 
