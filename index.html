@@ -303,6 +303,8 @@ Plotly.newPlot(TESTER2, [trace2], layout2);
 soundNo=intoByteArr(white_n);
 
 /// THIS IS TO INITIALIZE AUDIO
+var AudioContext = window.AudioContext          // Default
+          || window.webkitAudioContext;  // Safari and old versions of Chrome
 var context = new AudioContext();
     context.resume().then(() => {
     var sineWave = new Pizzicato.Sound({ 
@@ -330,6 +332,8 @@ function passsound(){
 function functionButton(){
     //console.log(soundNo)
     //16384
+    var AudioContext = window.AudioContext          // Default
+          || window.webkitAudioContext;  // Safari and old versions of Chrome
     var context = new AudioContext();
     context.resume().then(() => {
     
