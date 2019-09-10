@@ -305,7 +305,13 @@ soundNo=intoByteArr(white_n);
 /// THIS IS TO INITIALIZE AUDIO
 var AudioContext = window.AudioContext          // Default
           || window.webkitAudioContext;  // Safari and old versions of Chrome
-var context = new AudioContext();
+	
+var AudioContext = window.AudioContext // Default
+    || window.webkitAudioContext // Safari and old versions of Chrome
+    || false; 
+
+if (AudioContext) {
+    var context = new AudioContext();
     context.resume().then(() => {
     var sineWave = new Pizzicato.Sound({ 
     source: 'wave', 
@@ -319,8 +325,16 @@ sineWave.pause();
 
 ///////
   });
-}
+} else {
+    // Web Audio API is not supported
+    // Alert the user
+    alert("Sorry, but the Web Audio API is not supported by your browser. Please, consider upgrading to the latest version or downloading Google Chrome or Mozilla Firefox");
+}	
+	
+	
 
+}
+//////////////
 
 
 var global_ind =-1;
@@ -332,7 +346,15 @@ function passsound(){
 function functionButton(){
     //console.log(soundNo)
     //16384
-    var AudioContext = window.AudioContext          // Default
+	
+	
+	
+    var AudioContext = window.AudioContext // Default
+    || window.webkitAudioContext // Safari and old versions of Chrome
+    || false; 
+
+if (AudioContext) {
+      var AudioContext = window.AudioContext          // Default
           || window.webkitAudioContext;  // Safari and old versions of Chrome
     var context = new AudioContext();
     context.resume().then(() => {
@@ -358,6 +380,16 @@ function functionButton(){
     lll.play();
     setTimeout(function(){lll.pause()},1000);
   });
+} else {
+    // Web Audio API is not supported
+    // Alert the user
+    alert("Sorry, but the Web Audio API is not supported by your browser. Please, consider upgrading to the latest version or downloading Google Chrome or Mozilla Firefox");
+}
+	
+	
+	
+	
+  
 
 
 }
