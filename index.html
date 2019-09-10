@@ -352,8 +352,8 @@ function functionButton(){
     || false; 
 
 if (AudioContext) {
-    var context = new AudioContext();
-    context.resume().then(() => {
+   // var context = new AudioContext();
+    //context.resume().then(() => {
     
     
     
@@ -375,7 +375,7 @@ if (AudioContext) {
     lll.volume = 1;
     lll.play();
     setTimeout(function(){lll.pause()},1000);
-  });
+  //});
 } else {
     // Web Audio API is not supported
     // Alert the user
