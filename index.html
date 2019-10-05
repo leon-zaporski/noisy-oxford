@@ -20,11 +20,11 @@
 
 <body bgcolor="#191A1A">
     <center><p style = "font-family:'Courier New', Courier, monospace;font-size:16px;">
-        1 Second of Coloured Noise
+        <b>1 Second of Coloured Noise</b>
      </p></center>
 <center><div id="tester" style="width:95%;height:45%;"></div></center> 
 <center><p style = "font-family:'Courier New', Courier, monospace;font-size:16px;">
-    Power Spectrum
+    <b>Power Spectrum</b>
  </p></center>
 <center><div id="tester2" style="width:95%;height:45%;"></div> </center> 
 	
@@ -130,38 +130,99 @@ TESTER2 = document.getElementById('tester2');
 
 var layout2 = {
   xaxis: {
+    gridcolor: '#505050',
+    title:'Frequency [Hz]',
+    titlefont: {
+      //family: 'Arial, sans-serif',
+      family: 'Courier New, Courier, monospace',
+      color: 'lightgrey'
+    },
     type: 'log',
-    autorange: true
+    autorange: true,
+    tickfont: {
+      family: 'Courier New, Courier, monospace',
+      color: 'lightgrey'
+    },
   },
   yaxis: {
+    gridcolor: '#505050',
+    title:'Power',
+    titlefont: {
+      //family: 'Arial, sans-serif',
+      family: 'Courier New, Courier, monospace',
+      color: 'lightgrey'
+    },
     type: 'log',
-    autorange: true
+    autorange: true,
+    tickfont: {
+      family: 'Courier New, Courier, monospace',
+      color: 'lightgrey'
+    },
   },
-  height: 300,
+  
+  height: 250,
   margin: { t: 0 },
   paper_bgcolor: '#191A1A',
   plot_bgcolor: '#191A1A',
   };
 
+var layout1 = {
+  xaxis: {
+    gridcolor: '#505050',
+    title:'Sample',
+    titlefont: {
+      //family: 'Arial, sans-serif',
+      family: 'Courier New, Courier, monospace',
+      color: 'lightgrey'
+    },
+    autorange: true,
+    tickfont: {
+      family: 'Courier New, Courier, monospace',
+      color: 'lightgrey'
+    }
+  },
+  yaxis: {
+    gridcolor: '#505050',
+    title:'Amplitude',
+    titlefont: {
+      //family: 'Arial, sans-serif',
+      family: 'Courier New, Courier, monospace',
+      color: 'lightgrey'
+    },
+    autorange: true,
+    tickfont: {
+      family: 'Courier New, Courier, monospace',
+      color: 'lightgrey'
+    },
+  },
+  
+  height: 250,
+  margin: { t: 0 },
+  paper_bgcolor: '#191A1A',
+  plot_bgcolor: '#191A1A',
+  };
 
-Plotly.newPlot(TESTER, [trace1], {height: 300, margin: { t: 0 }, paper_bgcolor: '#191A1A', plot_bgcolor: '#191A1A'},
+Plotly.newPlot(TESTER, [trace1], layout1,
   {displayModeBar: false});
 Plotly.newPlot(TESTER2, [trace2], layout2,{displayModeBar: false});
 
 ////GUI
+var slider_global = 0;
 var gui = new dat.GUI();
 
 var obj = {
-	alpha: 0,
+  b: 0,
+  Randomize: function(){myFunction(slider_global)}, 
   PlayNoise: function(){functionButton()}
 };
 
-gui.add(obj, "alpha").min(-2).max(2).step(0.001).onFinishChange(function(newValue) { //onChange
+gui.add(obj, "b").min(-2).max(2).step(0.001).onFinishChange(function(newValue) { //onChange
 	myFunction(newValue);
 }).listen();
+gui.add(obj,"Randomize");
+//gui.add(obj,"PlayNoise");
 
-gui.add(obj,"PlayNoise");
-
+var before_click = true;   ///NEW
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -169,9 +230,16 @@ var slider = document.getElementById("myRange")
 // Oninput:
 //slider.onclick= function myFunction() {
 function myFunction(newValue1) {
+
+   if (before_click){    /// New
+    gui.add(obj,"PlayNoise");
+    before_click = false;
+   };   //// New
+
    // sliderr = Number(this.value);
     //whitenoise generation
     sliderr=Number(newValue1);
+    slider_global = sliderr;
     var indices = Array.from(Array(lenarr).keys());
     
     var imag = Array.apply(null, Array(indices.length)).map(Number.prototype.valueOf,0);
@@ -219,86 +287,12 @@ function myFunction(newValue1) {
 TESTER = document.getElementById('tester');
 TESTER2 = document.getElementById('tester2'); 
 
-var layout2 = {
-  xaxis: {
-    type: 'log',
-    autorange: true
-  },
-  yaxis: {
-    type: 'log',
-    autorange: true
-  },
-  paper_bgcolor: '#191A1A',
-  plot_bgcolor: '#191A1A',
-  height: 300,margin: { t: 0 },
-  };
 
-//height: 300,
+Plotly.newPlot(TESTER, [trace1], layout1,
+  {displayModeBar: false});
+Plotly.newPlot(TESTER2, [trace2], layout2,
+  {displayModeBar: false});
 
-Plotly.newPlot(TESTER, [trace1], { height: 300, margin: { t: 0 }, paper_bgcolor: '#191A1A', plot_bgcolor: '#191A1A'} );
-Plotly.newPlot(TESTER2, [trace2], layout2);
-
-
-///ANIMATED - no color change possible atm
-// Plotly.animate(TESTER, {
-//     layout: {
-//       yaxis: {range: [Math.min.apply(null, white_n), Math.max.apply(null, white_n)]},
-//       color: colormap_1(sliderr).css()
-//     }
-//   }, {
-//     transition: {
-//       duration: 300,
-//       easing: 'cubic-in-out'
-//     }
-//   })
-
-// Plotly.animate(TESTER,{
-//     data: [{y: white_n}],
-//     traces: [0],
-//     layout: {}}, {
-//     transition: {
-//       duration: 300,
-//       easing: 'cubic-in-out'
-//     },
-//     frame: {
-//       duration: 300
-//     }
-//   });
-
-
-
-//   Plotly.animate(TESTER2,{
-//     data: [{y: spectre.slice(1,Math.floor(indices.length/2))}],
-//     traces: [0],
-//     layout: {}}, {
-//     transition: {
-//       duration: 300,
-//       easing: 'cubic-in-out'
-//     },
-//     frame: {
-//       duration: 300
-//     }
-//   });
-
-//   Plotly.animate(TESTER2, {
-//     layout: {
-//        xaxis: {
-//     type: 'log',
-//     autorange: true
-//   },
-//   yaxis: {
-//     type: 'log',
-//     autorange: true
-//   },
-//   height: 300,margin: { t: 0 },
-//   color: colormap_1(sliderr).css()
-//     }
-//   }, {
-//     transition: {
-//       duration: 300,
-//       easing: 'cubic-in-out'
-//     }
-//   })
   
 soundNo=intoByteArr(white_n);
 
@@ -382,11 +376,6 @@ if (AudioContext) {
     alert("Sorry, but the Web Audio API is not supported by your browser. Please, consider upgrading to the latest version or downloading Google Chrome or Mozilla Firefox");
 }
 	
-	
-	
-	
-  
-
 
 }
 
