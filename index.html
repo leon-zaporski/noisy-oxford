@@ -28,12 +28,12 @@ p.customfont {
 </style>
 
 <body bgcolor="#191A1A">
-    <center><p  style = "font-family:'My Custom Font';font-size:25px; display: inline-block;">
+    <center><p  style = "font-family:'My Custom Font';font-size:35px; display: inline-block;">
         <b>1 Second of Coloured Noise</b>
      </p></center>
 <center><div id="tester" style="width:95%;height:45%;"></div></center> 
-<center><p style = "font-family:'My Custom Font';font-size:25px; display: inline-block;">
-  <b>Power Spectrum &nbsp;</b> 
+<center><p style = "font-family:'My Custom Font';font-size:35px; display: inline-block;">
+  <b>Noise spectral density &nbsp;</b> 
 </p>
 
 <p style="display: inline-block;" =>$$ S(f) \propto \frac{1}{f^b} $$</p>
@@ -144,33 +144,35 @@ TESTER2 = document.getElementById('tester2');
 var layout2 = {
   xaxis: {
     gridcolor: '#505050',
-    title:'Frequency [Hz]',
+    title:'Frequency f[Hz]',
     titlefont: {
       //family: 'Arial, sans-serif',
       family: 'My Custom Font',
-      size: 20,
+      size: 30,
       color: 'lightgrey'
     },
     type: 'log',
     autorange: true,
     tickfont: {
       family: 'Courier New, Courier, monospace',
+      size: 20,
       color: 'lightgrey'
     },
   },
   yaxis: {
     gridcolor: '#505050',
-    title:'Power',
+    title:'S(f)',
     titlefont: {
       //family: 'Arial, sans-serif',
       family: 'My Custom Font',
-      size: 20,
+      size: 30,
       color: 'lightgrey'
     },
     type: 'log',
     autorange: true,
     tickfont: {
       family: 'Courier New, Courier, monospace',
+      size: 20,
       color: 'lightgrey'
     },
   },
@@ -188,12 +190,13 @@ var layout1 = {
     titlefont: {
       //family: 'Arial, sans-serif',
       family: 'My Custom Font',
-      size: 20,
+      size: 30,
       color: 'lightgrey'
     },
     autorange: true,
     tickfont: {
       family: 'Courier New, Courier, monospace',
+      size: 20,
       color: 'lightgrey'
     }
   },
@@ -203,12 +206,13 @@ var layout1 = {
     titlefont: {
       //family: 'Arial, sans-serif',
       family: 'My Custom Font',
-      size: 20,
+      size: 30,
       color: 'lightgrey'
     },
     autorange: true,
     tickfont: {
       family: 'Courier New, Courier, monospace',
+      size: 20,
       color: 'lightgrey'
     },
   },
